@@ -3,56 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aktivasi Zent.id</title>
+    <title>Presensi Zent.id - External</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { background: #f4f7f6; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .card { width: 100%; max-width: 400px; border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        body { background: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .container { max-width: 500px; padding-top: 20px; }
+        .card { border-radius: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        #map { height: 200px; width: 100%; border-radius: 10px; margin-bottom: 15px; }
+        #video { width: 100%; border-radius: 10px; transform: scaleX(-1); background: #000; }
+        .btn-primary { background: #007bff; border: none; padding: 12px; font-weight: bold; }
+        #loading { display: none; }
     </style>
 </head>
 <body>
-    <div class="card p-4 text-center">
-        <h2 class="fw-bold mb-3">Aktivasi Zent.id</h2>
-        <p class="text-muted">Masukkan Client ID Perusahaan Anda</p>
-        <input type="text" id="client-id" class="form-control form-control-lg mb-3 text-center" placeholder="Contoh: C001">
-        <button onclick="connect()" class="btn btn-primary w-100 btn-lg">Hubungkan</button>
+
+<div class="container">
+    <div class="card p-4">
+        <h4 class="text-center mb-4">Presensi Digital Zent.id</h4>
+        
+        <div id="map"></div>
+        
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+
+        <div class="mt-3">
+            <label class="form-label">ID Pegawai</label>
+            <input type="text" id="idPegawai" class="form-control" placeholder="Masukkan ID">
+        </div>
+
+        <div class="mt-3">
+            <label class="form-label">Status</label>
+            <select id="statusAbsen" class="form-select">
+                <option value="MASUK">MASUK</option>
+                <option value="PULANG">PULANG</option>
+            </select>
+        </div>
+
+        <button id="btnSubmit" class="btn btn-primary w-100 mt-4" onclick="kirimPresensi()">KIRIM PRESENSI</button>
+        
+        <div id="loading" class="text-center mt-3">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Memproses data...</p>
+        </div>
     </div>
+</div>
 
-    <script>
-        // PENTING: Ganti URL di bawah ini dengan URL Web App Data Center Bapak yang baru
-        const DATA_CENTER_URL = "https://script.google.com/macros/s/AKfycbwidfOhbd9T7QWLX7_VKafYIb5VszzjoJBMfRDGgjasvKRbu3nS3hr8rEyVATo8i6t_-A/exec";
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // GANTI DENGAN URL WEB APP GAS ANDA SETELAH DEPLOY
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwO1EMmhbvxPJoqMLS7m9SdF0Lyk5cvTcgPuCib6crYscy471i-Ke9MXqu8gtlJSEY0EQ/exec"; 
 
-        async function connect() {
-            const cid = document.getElementById('client-id').value.trim();
-            if(!cid) return Swal.fire('Peringatan', 'Masukkan Client ID!', 'warning');
+    let lat, lng;
+    const video = document.getElementById('video');
 
-            Swal.fire({ title: 'Menghubungkan...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+    // 1. Inisialisasi Peta Leaflet
+    const map = L.map('map').setView([0, 0], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    const marker = L.marker([0, 0]).addTo(map);
 
-            try {
-                // Menggunakan mode 'cors' dan menambahkan parameter di URL
-                const response = await fetch(`${DATA_CENTER_URL}?clientId=${cid}`);
-                const res = await response.json();
+    // 2. Ambil Lokasi Real-time
+    if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(position => {
+            lat = position.coords.latitude;
+            lng = position.coords.longitude;
+            const pos = [lat, lng];
+            map.setView(pos, 16);
+            marker.setLatLng(pos);
+        }, err => {
+            Swal.fire("GPS Error", "Mohon aktifkan lokasi Anda", "error");
+        }, { enableHighAccuracy: true });
+    }
 
-                if(res.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil Terhubung!',
-                        text: 'Selamat Datang ' + res.clientName,
-                        timer: 2000,
-                        showConfirmButton: false
-                    }).then(() => {
-                        // Mengarahkan ke Web App milik Customer
-                        window.location.href = res.targetUrl;
-                    });
-                } else {
-                    Swal.fire('Gagal', res.message, 'error');
-                }
-            } catch (err) {
-                console.error(err);
-                Swal.fire('Error', 'Gagal menghubungi server. Pastikan URL Data Center benar dan sudah di-Deploy sebagai "Anyone".', 'error');
-            }
+    // 3. Inisialisasi Kamera
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(stream => { video.srcObject = stream; })
+        .catch(err => { Swal.fire("Kamera Error", "Gagal mengakses kamera", "error"); });
+
+    // 4. Fungsi Kirim Data
+    async function kirimPresensi() {
+        const idPegawai = document.getElementById('idPegawai').value;
+        const status = document.getElementById('statusAbsen').value;
+        
+        if (!idPegawai) return Swal.fire("Peringatan", "Isi ID Pegawai", "warning");
+        if (!lat) return Swal.fire("Peringatan", "Menunggu koordinat GPS...", "warning");
+
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('btnSubmit').disabled = true;
+
+        // Ambil foto dari video
+        const canvas = document.getElementById('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        const fotoBase64 = canvas.toDataURL('image/jpeg');
+
+        const payload = {
+            idPegawai: idPegawai,
+            status: status,
+            koordinatGPS: lat + "," + lng,
+            fotoSelfie: fotoBase64,
+            namaLengkap: "User External" // Nama bisa ditarik otomatis di backend GAS
+        };
+
+        try {
+            const response = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Penting untuk menghindari CORS issue di GAS
+                cache: 'no-cache',
+                body: JSON.stringify(payload)
+            });
+            
+            Swal.fire("Berhasil", "Data sedang diproses. Silakan cek spreadsheet dalam beberapa saat.", "success");
+        } catch (error) {
+            Swal.fire("Error", "Gagal menghubungi server", "error");
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('btnSubmit').disabled = false;
         }
-    </script>
+    }
+</script>
 </body>
 </html>
