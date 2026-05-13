@@ -13,238 +13,262 @@
         .hidden { display: none !important; }
         #camera-view, #photo-preview { width: 100%; border-radius: 15px; transform: scaleX(-1); background: #000; }
         #loading-overlay { z-index: 9999; background: rgba(255,255,255,0.9); position: fixed; top: 0; left: 0; }
-        .btn-check:checked + .btn-outline-primary { background-color: #0d6efd; color: white; }
+        .login-header { background: linear-gradient(135deg, #0d6efd 0%, #0043a8 100%); color: white; padding: 40px 20px; border-radius: 20px 20px 0 0; }
     </style>
 </head>
 <body>
 
-    <div id="loading-overlay" class="hidden w-100 h-100 d-flex flex-column align-items-center justify-content-center">
-        <div class="spinner-border text-primary mb-3"></div>
-        <p class="fw-bold">Memproses Data ke Server...</p>
+    <div id="loading-overlay" class="hidden d-flex justify-content-center align-items-center w-100 h-100">
+        <div class="spinner-border text-primary" role="status"></div>
     </div>
 
-    <div id="login-page" class="container min-vh-100 d-flex align-items-center justify-content-center">
-        <div class="card p-4 shadow w-100" style="max-width: 380px;">
-            <div class="text-center mb-4">
-                <i class="bi bi-shield-lock-fill text-primary" style="font-size: 3rem;"></i>
-                <h4 class="fw-bold">Zent.id Login</h4>
-            </div>
-            <input type="text" id="id-pegawai" class="form-control form-control-lg mb-3" placeholder="ID Pegawai">
-            <input type="password" id="password" class="form-control form-control-lg mb-4" placeholder="Password">
-            <button id="login-button" class="btn btn-primary w-100 btn-lg">MASUK</button>
-        </div>
-    </div>
-
-    <div id="menu-page" class="container py-5 hidden">
-        <div class="card p-4 text-center bg-primary text-white mb-4">
-            <h1 id="digital-clock" class="display-3 fw-bold mb-0">00:00</h1>
-            <p id="current-date" class="mb-3"></p>
-            <h4 id="display-name" class="fw-bold mb-0">-</h4>
-            <small id="display-jabatan" class="text-uppercase">Jabatan</small>
-        </div>
-        <button id="btn-open-absen" class="btn btn-white shadow w-100 py-4 fs-5 fw-bold rounded-4 border-0 mb-3">
-            <i class="bi bi-geo-alt-fill me-2 text-primary"></i> MULAI PRESENSI
-        </button>
-        <button id="logout-button" class="btn btn-danger w-100 py-3 rounded-4 fw-bold">LOGOUT / KELUAR</button>
-    </div>
-
-    <div id="absensi-page" class="container py-4 hidden">
-        <div class="d-flex align-items-center mb-4">
-            <button id="btn-back" class="btn btn-light rounded-circle me-3"><i class="bi bi-arrow-left"></i></button>
-            <h4 class="mb-0 fw-bold">Kirim Presensi</h4>
-        </div>
-
-        <div class="card p-3 mb-3">
-            <div class="row g-2">
-                <div class="col-3"><input type="radio" class="btn-check" name="status" id="s1" value="MASUK"><label class="btn btn-outline-primary w-100 py-2 small fw-bold" for="s1">MASUK</label></div>
-                <div class="col-3"><input type="radio" class="btn-check" name="status" id="s2" value="PULANG"><label class="btn btn-outline-success w-100 py-2 small fw-bold" for="s2">PULANG</label></div>
-                <div class="col-3"><input type="radio" class="btn-check" name="status" id="s3" value="IZIN"><label class="btn btn-outline-warning w-100 py-2 small fw-bold" for="s3">IZIN/S</label></div>
-                <div class="col-3"><input type="radio" class="btn-check" name="status" id="s4" value="LIBUR"><label class="btn btn-outline-secondary w-100 py-2 small fw-bold" for="s4">LIBUR</label></div>
+    <div class="container py-5">
+        <div id="login-page" class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card overflow-hidden">
+                    <div class="login-header text-center">
+                        <i class="bi bi-building-lock display-4"></i>
+                        <h3 class="mt-3 fw-bold">Presensi Digital</h3>
+                        <p class="mb-0">Multi-Company SaaS Version</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="login-form">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">ID PERUSAHAAN</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-building"></i></span>
+                                    <input type="text" id="company-id" class="form-control bg-light border-start-0" placeholder="Contoh: ZENT01" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">ID PEGAWAI</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-person"></i></span>
+                                    <input type="text" id="id-pegawai" class="form-control bg-light border-start-0" placeholder="ID Pegawai" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold">PASSWORD</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-key"></i></span>
+                                    <input type="password" id="password" class="form-control bg-light border-start-0" placeholder="••••••••" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold">MASUK</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="box-tanggal-khusus" class="card p-3 mb-3 hidden border-primary">
-            <label class="form-label small fw-bold text-primary">TENTUKAN TANGGAL KEJADIAN:</label>
-            <input type="date" id="tgl-khusus" class="form-control">
+        <div id="menu-page" class="row justify-content-center hidden">
+            <div class="col-md-6">
+                <div class="card p-4 text-center">
+                    <div class="d-flex align-items-center mb-4 text-start">
+                        <div class="bg-primary text-white rounded-circle p-3 me-3">
+                            <i class="bi bi-person-circle fs-3"></i>
+                        </div>
+                        <div>
+                            <h5 id="display-name" class="mb-0 fw-bold">-</h5>
+                            <p id="display-job" class="text-muted small mb-0">-</p>
+                        </div>
+                        <button id="logout-button" class="btn btn-link ms-auto text-danger"><i class="bi bi-box-arrow-right fs-4"></i></button>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <button onclick="prepareAction('MASUK')" class="btn btn-outline-primary w-100 py-4 card">
+                                <i class="bi bi-box-arrow-in-right fs-1 mb-2"></i>
+                                <span>MASUK</span>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button onclick="prepareAction('PULANG')" class="btn btn-outline-success w-100 py-4 card">
+                                <i class="bi bi-box-arrow-right fs-1 mb-2"></i>
+                                <span>PULANG</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div id="box-masuk" class="mb-3 hidden"><input type="text" id="ket-masuk" class="form-control" placeholder="Keterangan Masuk"></div>
-        <div id="box-pulang" class="mb-3 hidden"><textarea id="ket-pulang" class="form-control" placeholder="Realisasi Pekerjaan Hari Ini"></textarea></div>
-        <div id="box-izin" class="mb-3 hidden"><textarea id="ket-izin" class="form-control" placeholder="Alasan Izin/Sakit/Libur"></textarea></div>
-
-        <div id="camera-area" class="card p-2 bg-dark mb-3 shadow">
-            <video id="camera-view" autoplay playsinline></video>
-            <img id="photo-preview" class="hidden">
-            <canvas id="camera-canvas" class="hidden"></canvas>
-            <button id="btn-snap" class="btn btn-warning w-100 mt-2 fw-bold">AMBIL FOTO SELFIE</button>
+        <div id="action-page" class="row justify-content-center hidden">
+            <div class="col-md-6">
+                <div class="card p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <button onclick="showPage('menu-page')" class="btn btn-light rounded-circle me-3"><i class="bi bi-arrow-left"></i></button>
+                        <h5 class="mb-0 fw-bold">Absensi <span id="action-label"></span></h5>
+                    </div>
+                    <div class="position-relative mb-3">
+                        <video id="camera-view" autoplay playsinline></video>
+                        <img id="photo-preview" class="hidden">
+                        <button id="btn-capture" class="btn btn-primary rounded-circle position-absolute bottom-0 start-50 translate-middle-x mb-3 shadow" style="width:60px; height:60px;">
+                            <i class="bi bi-camera-fill fs-4"></i>
+                        </button>
+                    </div>
+                    <div id="extra-fields">
+                        <div id="field-masuk" class="mb-3 hidden">
+                            <label class="form-label small fw-bold">Keterangan Masuk</label>
+                            <input type="text" id="ket-masuk" class="form-control" placeholder="Tujuan hari ini">
+                        </div>
+                        <div id="field-pulang" class="mb-3 hidden">
+                            <label class="form-label small fw-bold">Realisasi Pekerjaan</label>
+                            <textarea id="ket-pulang" class="form-control" rows="3" placeholder="Laporan hari ini"></textarea>
+                        </div>
+                    </div>
+                    <button id="btn-submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold mt-2">KIRIM ABSENSI</button>
+                </div>
+            </div>
         </div>
-
-        <div id="gps-status" class="alert alert-secondary text-center small py-2 mb-3">Mencari Koordinat GPS...</div>
-        <button id="btn-submit" class="btn btn-primary w-100 btn-lg py-3 shadow" disabled>KIRIM PRESENSI</button>
     </div>
 
     <script>
-        // MASUKKAN URL WEB APP ANDA DI SINI SETELAH DEPLOY
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9nhbsii4xpQOttFXx_MSMcCsafar61f3EJrfBJHoTXzx4q5UpKvOuCU6JAok9swhF4A/exec"; 
+        // GANTI DENGAN URL WEBAPP DARI SPREADSHEET MASTER ANDA
+        const MASTER_URL = "https://script.google.com/macros/s/AKfycbzo9NhsrbfoUOKAJhQLYTop-TNZW7nijcX2WWsqje4QcxM2kSFbATcbU1KyJChKT8QwYg/exec"; 
 
-        let userData = {}; 
-        let userGPS = ""; 
-        let stream = null; 
+        let userData = null;
+        let clientUrl = "";
+        let userGPS = "";
         let photo = "";
+        let stream = null;
+        let currentStatus = "";
 
-        setInterval(() => {
-            const n = new Date();
-            document.getElementById('digital-clock').textContent = n.toLocaleTimeString('id-ID', {hour12:false, hour:'2-digit', minute:'2-digit'});
-            document.getElementById('current-date').textContent = n.toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
-        }, 1000);
+        // Load Company ID dari memori browser
+        window.onload = () => {
+            const savedId = localStorage.getItem('company_id');
+            if(savedId) document.getElementById('company-id').value = savedId;
+        };
 
         function showPage(id) {
-            ['login-page', 'menu-page', 'absensi-page'].forEach(p => document.getElementById(p).classList.add('hidden'));
+            ['login-page', 'menu-page', 'action-page'].forEach(p => document.getElementById(p).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
+            if(id !== 'action-page' && stream) { stream.getTracks().forEach(t => t.stop()); }
         }
 
-        document.getElementById('login-button').addEventListener('click', () => {
-            const id = document.getElementById('id-pegawai').value;
-            const pw = document.getElementById('password').value;
-            if(!id || !pw) return Swal.fire('Peringatan', 'Lengkapi ID & Password', 'warning');
-            
+        // PROSES LOGIN (DENGAN HANDSHAKE MASTER)
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const companyId = document.getElementById('company-id').value.toUpperCase();
+            const idPegawai = document.getElementById('id-pegawai').value;
+            const password = document.getElementById('password').value;
+
             document.getElementById('loading-overlay').classList.remove('hidden');
-            
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ action: 'login', idPegawai: id, password: pw })
-            })
-            .then(res => res.json())
-            .then(res => {
+
+            try {
+                // 1. Handshake ke Master Script
+                const masterRes = await fetch(MASTER_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'get_client_config', companyId: companyId })
+                });
+                const masterData = await masterRes.json();
+
+                if(!masterData.success) throw new Error(masterData.message);
+
+                clientUrl = masterData.url;
+                localStorage.setItem('company_id', companyId);
+
+                // 2. Login ke Database Perusahaan
+                const loginRes = await fetch(clientUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'login', idPegawai: idPegawai, password: password })
+                });
+                const loginData = await loginRes.json();
+
                 document.getElementById('loading-overlay').classList.add('hidden');
-                if(res.success) {
-                    userData = {id, nama:res.data.nama, jabatan:res.data.jabatan};
-                    document.getElementById('display-name').textContent = res.data.nama;
-                    document.getElementById('display-jabatan').textContent = res.data.jabatan;
+
+                if(loginData.success) {
+                    userData = { ...loginData.data, idPegawai: idPegawai };
+                    document.getElementById('display-name').innerText = userData.nama;
+                    document.getElementById('display-job').innerText = userData.jabatan;
                     showPage('menu-page');
-                    getGPS();
-                } else { Swal.fire('Gagal', res.message, 'error'); }
-            })
-            .catch(err => {
+                } else {
+                    Swal.fire('Login Gagal', loginData.message, 'error');
+                }
+            } catch (err) {
                 document.getElementById('loading-overlay').classList.add('hidden');
-                Swal.fire('Error', 'Gagal menghubungi server', 'error');
-            });
+                Swal.fire('Error', err.message, 'error');
+            }
         });
 
-        function getGPS() {
-            if (!navigator.geolocation) return Swal.fire('Error', 'Browser tidak mendukung GPS', 'error');
-            navigator.geolocation.getCurrentPosition(p => {
-                userGPS = `${p.coords.latitude},${p.coords.longitude}`;
-                const statusGps = document.getElementById('gps-status');
-                statusGps.className = "alert alert-success text-center small py-2 mb-3";
-                statusGps.textContent = "GPS Terkunci (Lokasi Siap)";
-                checkReady();
-            }, (err) => {
-                Swal.fire('GPS Error', 'Mohon aktifkan GPS dan berikan izin lokasi!', 'error');
-            }, { enableHighAccuracy: true });
+        async function prepareAction(status) {
+            currentStatus = status;
+            document.getElementById('action-label').innerText = status;
+            document.getElementById('field-masuk').classList.toggle('hidden', status !== 'MASUK');
+            document.getElementById('field-pulang').classList.toggle('hidden', status !== 'PULANG');
+            
+            showPage('action-page');
+            
+            navigator.geolocation.getCurrentPosition(
+                pos => { userGPS = `${pos.coords.latitude},${pos.coords.longitude}`; },
+                err => { Swal.fire('GPS Error', 'Aktifkan lokasi Anda', 'error'); showPage('menu-page'); }
+            );
+
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+                document.getElementById('camera-view').srcObject = stream;
+            } catch (err) {
+                Swal.fire('Kamera Error', 'Akses kamera ditolak', 'error');
+            }
         }
 
-        document.getElementById('btn-open-absen').addEventListener('click', async () => {
-            showPage('absensi-page');
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}});
-                document.getElementById('camera-view').srcObject = stream;
-            } catch(e) { Swal.fire('Kamera Error', 'Izin kamera diperlukan!', 'error'); }
-        });
-
-        document.getElementById('btn-snap').addEventListener('click', () => {
+        document.getElementById('btn-capture').addEventListener('click', () => {
             const v = document.getElementById('camera-view');
-            const c = document.getElementById('camera-canvas');
-            c.width = v.videoWidth; 
-            c.height = v.videoHeight;
-            c.getContext('2d').drawImage(v, 0, 0);
+            const c = document.createElement('canvas');
+            c.width = v.videoWidth; c.height = v.videoHeight;
+            const ctx = c.getContext('2d');
+            ctx.translate(c.width, 0); ctx.scale(-1, 1);
+            ctx.drawImage(v, 0, 0);
             photo = c.toDataURL('image/jpeg', 0.7);
             document.getElementById('photo-preview').src = photo;
             document.getElementById('photo-preview').classList.remove('hidden');
             v.classList.add('hidden');
-            checkReady();
         });
 
-        document.querySelectorAll('input[name="status"]').forEach(r => {
-            r.addEventListener('change', e => {
-                const v = e.target.value;
-                document.getElementById('box-masuk').classList.toggle('hidden', v !== 'MASUK');
-                document.getElementById('box-pulang').classList.toggle('hidden', v !== 'PULANG');
-                document.getElementById('box-izin').classList.toggle('hidden', !['IZIN','LIBUR','SAKIT'].includes(v));
-                document.getElementById('box-tanggal-khusus').classList.toggle('hidden', !['IZIN','LIBUR','SAKIT'].includes(v));
-                
-                if(['IZIN','LIBUR','SAKIT'].includes(v)) { 
-                    photo = "BYPASS_FOR_PERMISSION"; 
-                    document.getElementById('camera-area').classList.add('hidden');
-                    if(!document.getElementById('tgl-khusus').value) {
-                        document.getElementById('tgl-khusus').value = new Date().toISOString().split('T')[0];
-                    }
-                } else { 
-                    photo = ""; 
-                    document.getElementById('camera-area').classList.remove('hidden');
-                    document.getElementById('photo-preview').classList.add('hidden');
-                    document.getElementById('camera-view').classList.remove('hidden');
-                }
-                checkReady();
-            });
-        });
-
-        function checkReady() {
-            const s = document.querySelector('input[name="status"]:checked');
-            document.getElementById('btn-submit').disabled = !(s && userGPS && photo !== "");
-        }
-
-        document.getElementById('btn-submit').addEventListener('click', () => {
-            const s = document.querySelector('input[name="status"]:checked').value;
+        document.getElementById('btn-submit').addEventListener('click', async () => {
+            if(!photo) return Swal.fire('Foto?', 'Ambil foto selfie dulu', 'warning');
             document.getElementById('loading-overlay').classList.remove('hidden');
-            
-            const dataAbsen = {
-                idPegawai: userData.id, 
-                namaLengkap: userData.nama, 
-                status: s,
-                koordinatGPS: userGPS, 
-                fotoSelfie: photo,
-                clientTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                tglPilihan: document.getElementById('tgl-khusus').value,
-                keteranganMasuk: document.getElementById('ket-masuk').value,
-                realisasiPekerjaan: document.getElementById('ket-pulang').value,
-                keteranganIzin: document.getElementById('ket-izin').value
+
+            const payload = {
+                action: 'record',
+                data: {
+                    idPegawai: userData.idPegawai,
+                    namaLengkap: userData.nama,
+                    status: currentStatus,
+                    koordinatGPS: userGPS,
+                    fotoSelfie: photo,
+                    clientTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    keteranganMasuk: document.getElementById('ket-masuk').value,
+                    realisasiPekerjaan: document.getElementById('ket-pulang').value
+                }
             };
 
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ action: 'record', data: dataAbsen })
-            })
-            .then(res => res.json())
-            .then(res => {
+            try {
+                const res = await fetch(clientUrl, { method: 'POST', body: JSON.stringify(payload) });
+                const resData = await res.json();
                 document.getElementById('loading-overlay').classList.add('hidden');
-                if(res.success) {
-                    Swal.fire({ icon: 'success', title: 'Berhasil!', text: res.message });
-                    resetAppUI();
-                } else { Swal.fire('Gagal Presensi', res.message, 'error'); }
-            })
-            .catch(err => {
+                
+                if(resData.success) {
+                    Swal.fire('Berhasil!', resData.message, 'success');
+                    resetApp();
+                } else {
+                    Swal.fire('Gagal', resData.message, 'error');
+                }
+            } catch (err) {
                 document.getElementById('loading-overlay').classList.add('hidden');
-                Swal.fire('Error', 'Gagal mengirim data', 'error');
-            });
+                Swal.fire('Error', 'Gagal kirim data', 'error');
+            }
         });
 
-        function resetAppUI() {
-            if(stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+        function resetApp() {
             photo = "";
-            document.querySelectorAll('input[name="status"]').forEach(r => r.checked = false);
-            document.querySelectorAll('input[type="text"], textarea, input[type="date"]').forEach(i => i.value = "");
+            document.getElementById('camera-view').classList.remove('hidden');
+            document.getElementById('photo-preview').classList.add('hidden');
+            document.querySelectorAll('input, textarea').forEach(i => { if(i.id !== 'company-id') i.value = ""; });
             showPage('menu-page');
         }
 
-        document.getElementById('btn-back').addEventListener('click', () => {
-            if(stream) stream.getTracks().forEach(t => t.stop());
-            showPage('menu-page');
-        });
-
-        document.getElementById('logout-button').addEventListener('click', () => {
-            Swal.fire({ title: 'Logout?', icon: 'warning', showCancelButton: true }).then(r => { if(r.isConfirmed) location.reload(); });
-        });
+        document.getElementById('logout-button').addEventListener('click', () => { location.reload(); });
     </script>
 </body>
 </html>
